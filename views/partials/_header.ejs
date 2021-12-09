@@ -5,10 +5,25 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-      </div>
-    </div>
-  </nav>
+       <div class="navbar-nav">
+         <a class="nav-item nav-link" href="/urls">My URLs</a>
+         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+         <% if (username) { %>
+           <form class="form-inline" action="/urls/logout" method="POST">
+             <div class = "form-group mb-2">
+               <label>Logged in as <%= username %></label>
+               <button type="logout" class="btn btn-success" class="border border-white" >Logout</button>
+             </div>
+           </form>
+           <% } else { %>
+         <form class="form-inline" action="/urls/login" method="POST">
+           <div style = "position:absolute; right:80px; top:10px">
+             <input class="form-control" type="text" name="username" placeholder="Username">
+             <button type="login" class="btn btn-success" class="border border-white" >Login</button>
+           </div>
+         </form>
+         <% } %>
+       </div>
+     </div>
+   </nav>
 </header>
