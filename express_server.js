@@ -58,7 +58,7 @@ const getUserByEmail = function(email) {
       return user;
     }
   }
-  return null;
+  return undefined;
 }
 
 const urlDatabase = {
