@@ -51,29 +51,51 @@ const users = {
   }
 };
 
-const getUserByEmail = function(email) {
-  const userValues = Object.values(users);
-  for (const user of userValues) {
-    if (user.email === email) {
-      return user;
+const urlsForUser = function (id) {
+  let specificURLs = {};
+
+  for (let shortUrl in urlDatabase) {
+    if (urlDatabase[shortUrl]['userID'] === id) {
+      specificURLs[shortUrl] = urlDatabase[shortUrl];
     }
   }
-  return undefined;
+  console.log("Specific URLs:", specificURLs);
+  return specificURLs;
 }
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+      longURL: "https://www.lighthouselabs.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
 
 app.get("/urls", (req, res) => {
+  const id = req.cookies['user_ID'];
+  const user = users[id];
+  if (!user) {
+    return res.redirect('/login');
+  }
   const templateVars = { urls: urlDatabase, username: req.cookies['user_ID'] };
+  
   res.render("urls_index", templateVars);
 });
 
+
+
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies['user_ID']  };
-  res.render("urls_new", templateVars);
+  const userID = req.cookies['user_ID'];
+  const user = users[userID];
+  const templateVars = { username: req.cookies['user_ID'], user};
+  if (req.cookies['user_ID']) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // edit shortURLS
@@ -125,8 +147,7 @@ app.post("/login", (req, res) => {
   }
   //console.log(users);
   res.redirect('/urls');
-}); 
-
+});
 
 app.post("/urls", (req, res) => {
   let code = generateRandomString(6)
@@ -149,7 +170,7 @@ app.post("/register", (req, res) => {
   let usernameID = generateRandomString(6);
   //console.log(req.body);
   if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('Error 400 Bad Request: Enter username and password')
+    res.status(400).send('Error 400 Bad Request: Enter email and password')
   };
   if (checkUserEmail(req.body.email, users)) {
     res.status(400).send('Error 400 Bad Request: Account already exists')
@@ -168,7 +189,7 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 app.listen(PORT, () => {
