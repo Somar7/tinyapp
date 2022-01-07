@@ -99,7 +99,19 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const long = urlDatabase[req.params.shortURL].longURL;
   const templateVars = { shortURL: req.params.shortURL, longURL: long, username: users[req.cookies['user_ID']].email} ;
+  let user_ID = req.session.user_ID;
+  const user = req.session.user_ID;
+  if (!urlDatabase[req.params.shortURL]) {
+    res.send("Please try again! You don't have permission to view");
+  }
+  if (urlDatabase[req.params.shortURL].userID != user_ID) {
+    res.send("Please try again! You don't have permission to view");
+  }
+  if (!user) {
+    res.status(401).send("You must <a href='/login'>login</a> first.");
+  }
   res.render("urls_show", templateVars);
+
 });
 
 app.post("/urls/:shortURL/edit", (req,res) => {
@@ -169,6 +181,7 @@ app.post("/register", (req, res) => {
   //console.log(req.body);
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('Error 400 Bad Request: Enter username and password')
+    return;
   };
   if (checkUserEmail(req.body.email, users)) {
     res.status(400).send('Error 400 Bad Request: Account already exists')
